@@ -1,183 +1,233 @@
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+// Rutas de los ABI
+const tokenAPath = './Abi/TokenA.json';
+const tokenBPath = './Abi/TokenB.json';
+const simpleDexPath = './Abi/simpleDex.json';
 
-/**
- * @title SimpleDEX
- * @author Pablo Luna
- * @notice A decentralized exchange (DEX) for swapping two ERC20 tokens.
- * Allows liquidity addition, removal, and token swaps using a constant product formula.
- */
+let provider;
+let signer;
+let tokenAContract;
+let tokenBContract;
+let simpleDexContract;
+let userAddress;
 
-// Importing the IERC20 interface from the OpenZeppelin library for token interaction.
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-// Defining the SimpleDEX contract, a decentralized exchange (DEX) for swapping two ERC20 tokens.
-contract SimpleDEX {
-    /// @notice ERC20 token contract instances for the tokens in the DEX pool.
-    IERC20 public tokenA;
-    IERC20 public tokenB;
-
-    /// @notice Owner of the contract, allowed to add/remove liquidity.
-    address public owner;
-
-    /// @notice Reserve balances for each token in the liquidity pool.
-    uint256 public reserveA;
-    uint256 public reserveB;
-
-    /// @notice Emitted when liquidity is added to the pool.
-    event LiquidityAdded(uint256 amountA, uint256 amountB);
-
-    /// @notice Emitted when liquidity is removed from the pool.
-    event LiquidityRemoved(uint256 amountA, uint256 amountB);
-
-    /// @notice Emitted when tokens are swapped in the pool.
-    event TokensSwapped(
-        address indexed user,
-        uint256 amountIn,
-        uint256 amountOut,
-        string direction
-    );
-
-    /**
-     * @dev Initializes the contract with the two token addresses and sets the contract deployer as the owner.
-     * @param _tokenA Address of the first token.
-     * @param _tokenB Address of the second token.
-     */
-    constructor(address _tokenA, address _tokenB) {
-        require(_tokenA != _tokenB, "Tokens must be different");
-        tokenA = IERC20(_tokenA);
-        tokenB = IERC20(_tokenB);
-        owner = msg.sender;
-    }
-
-    /// @dev Modifier to restrict access to only the owner of the contract.
-    modifier onlyOwner() {
-        require(msg.sender == owner, "Not the owner");
-        _;
-    }
-
-    /**
-     * @notice Adds liquidity to the pool.
-     * @dev Requires the sender to be the owner and tokens to be approved beforehand.
-     * @param amountA Amount of token A to add.
-     * @param amountB Amount of token B to add.
-     */
-    function addLiquidity(uint256 amountA, uint256 amountB) external onlyOwner {
-        require(amountA > 0 && amountB > 0, "Invalid amounts");
-
-        if (reserveA > 0 && reserveB > 0) {
-            require(amountA * reserveB == amountB * reserveA, "Invalid ratio");
+// Cargar los ABI dinámicamente
+async function loadABI(path) {
+    try {
+        const response = await fetch(path);
+        if (!response.ok) {
+            throw new Error(`No se pudo cargar el ABI desde: ${path}`);
         }
-
-        require(
-            tokenA.allowance(msg.sender, address(this)) >= amountA,
-            "Token A allowance too low"
-        );
-        require(
-            tokenB.allowance(msg.sender, address(this)) >= amountB,
-            "Token B allowance too low"
-        );
-
-        tokenA.transferFrom(msg.sender, address(this), amountA);
-        tokenB.transferFrom(msg.sender, address(this), amountB);
-
-        reserveA += amountA;
-        reserveB += amountB;
-
-        emit LiquidityAdded(amountA, amountB);
+        return await response.json();
+    } catch (error) {
+        console.error('Error al cargar ABI:', error);
+        throw error;
     }
+}
 
-    /**
-     * @notice Swaps token A for token B.
-     * @dev Uses a constant product formula for calculating the output amount. Tokens must be approved beforehand.
-     * @param amountAIn Amount of token A to swap.
-     */
-    function swapAforB(uint256 amountAIn) external {
-        require(amountAIn > 0, "Invalid amount");
-        require(reserveA > 0 && reserveB > 0, "Pool is empty");
+// Conectar Wallet
+async function connectWallet() {
+    if (typeof window.ethereum !== 'undefined') {
+        try {
+            await ethereum.request({ method: 'eth_requestAccounts' });
+            provider = new ethers.providers.Web3Provider(window.ethereum);
+            signer = provider.getSigner();
 
-        uint256 amountBOut = (reserveB * amountAIn) / (reserveA + amountAIn);
-        require(amountBOut > 0, "Insufficient output amount");
+            userAddress = await signer.getAddress();
+            document.getElementById("userAddress").textContent = `Dirección: ${userAddress}`;
+            document.getElementById("connectWalletBtn").textContent = "Disconnect Wallet";
+            console.log('Wallet conectada:', userAddress);
 
-        require(
-            tokenA.allowance(msg.sender, address(this)) >= amountAIn,
-            "Token A allowance too low"
-        );
-
-        tokenA.transferFrom(msg.sender, address(this), amountAIn);
-        tokenB.transfer(msg.sender, amountBOut);
-
-        reserveA += amountAIn;
-        reserveB -= amountBOut;
-
-        emit TokensSwapped(msg.sender, amountAIn, amountBOut, "A to B");
-    }
-
-    /**
-     * @notice Swaps token B for token A.
-     * @dev Uses a constant product formula for calculating the output amount. Tokens must be approved beforehand.
-     * @param amountBIn Amount of token B to swap.
-     */
-    function swapBforA(uint256 amountBIn) external {
-        require(amountBIn > 0, "Invalid amount");
-        require(reserveA > 0 && reserveB > 0, "Pool is empty");
-
-        uint256 amountAOut = (reserveA * amountBIn) / (reserveB + amountBIn);
-        require(amountAOut > 0, "Insufficient output amount");
-
-        require(
-            tokenB.allowance(msg.sender, address(this)) >= amountBIn,
-            "Token B allowance too low"
-        );
-
-        tokenB.transferFrom(msg.sender, address(this), amountBIn);
-        tokenA.transfer(msg.sender, amountAOut);
-
-        reserveB += amountBIn;
-        reserveA -= amountAOut;
-
-        emit TokensSwapped(msg.sender, amountBIn, amountAOut, "B to A");
-    }
-
-    /**
-     * @notice Removes liquidity from the pool.
-     * @dev Only the owner can remove liquidity.
-     * @param amountA Amount of token A to withdraw.
-     * @param amountB Amount of token B to withdraw.
-     */
-    function removeLiquidity(
-        uint256 amountA,
-        uint256 amountB
-    ) external onlyOwner {
-        require(amountA > 0 && amountB > 0, "Invalid amounts");
-        require(
-            reserveA >= amountA && reserveB >= amountB,
-            "Not enough liquidity"
-        );
-
-        reserveA -= amountA;
-        reserveB -= amountB;
-
-        tokenA.transfer(msg.sender, amountA);
-        tokenB.transfer(msg.sender, amountB);
-
-        emit LiquidityRemoved(amountA, amountB);
-    }
-
-    /**
-     * @notice Gets the price of a token in terms of the other token.
-     * @param _token Address of the token to price.
-     * @return Price of 1 unit of the specified token in terms of the other token.
-     */
-    function getPrice(address _token) external view returns (uint256) {
-        require(
-            _token == address(tokenA) || _token == address(tokenB),
-            "Invalid token"
-        );
-
-        if (_token == address(tokenA)) {
-            return (reserveB * 1e18) / reserveA; // Token A price in terms of token B
+            await initContracts();
+            enableButtons();
+        } catch (err) {
+            console.error('Error al conectar wallet:', err);
+            alert('Error al conectar la wallet. Revisa la consola para más detalles.');
         }
-        return (reserveA * 1e18) / reserveB; // Token B price in terms of token A
+    } else {
+        alert('MetaMask no está instalado. Instálalo y recarga la página.');
+    }
+}
+
+// Función para desconectar la wallet (no hay desconexión real, solo cambiamos el estado del botón)
+function disconnectWallet() {
+    document.getElementById("connectWalletBtn").textContent = "Connect Wallet";
+    console.log("Desconectado de MetaMask");
+
+    // Limpiar la dirección (opcional)
+    document.getElementById("userAddress").textContent = "No hay wallet conectada.";
+    disableButtons();
+}
+
+// Agregar el evento al botón de conectar/desconectar
+const walletButton = document.getElementById("connectWalletBtn");
+walletButton.addEventListener('click', async () => {
+    if (walletButton.innerText === 'Connect Wallet') {
+        await connectWallet();
+    } else {
+        disconnectWallet();
+    }
+});
+
+// Inicializar contratos
+async function initContracts() {
+    try {
+        // Cargar los ABIs
+        const tokenAABI = await loadABI(tokenAPath);
+        const tokenBABI = await loadABI(tokenBPath);
+        const simpleDexABI = await loadABI(simpleDexPath);
+
+        // Direcciones de contratos
+        const tokenAAddress = '0x8853207Ba4e1D7da958C95DFd39F540D6059db1f';
+        const tokenBAddress = '0xFF0954673dE78C4766150f3070982Ca12a33CfF2';
+        const simpleDexAddress = '0x9E3eb6bF6506F62Ba0355F84D477C8D0A59581E5';
+
+        // Inicializar contratos con ethers.js
+        tokenAContract = new ethers.Contract(tokenAAddress, tokenAABI, signer);
+        tokenBContract = new ethers.Contract(tokenBAddress, tokenBABI, signer);
+        simpleDexContract = new ethers.Contract(simpleDexAddress, simpleDexABI, signer);
+
+        console.log('Contratos inicializados correctamente.');
+    } catch (error) {
+        console.error('Error al inicializar contratos:', error);
+        alert('No se pudieron inicializar los contratos. Revisa la consola.');
+    }
+}
+
+// Habilitar botones cuando la wallet está conectada
+function enableButtons() {
+    document.getElementById("addLiquidityBtn").disabled = false;
+    document.getElementById("approveTokenABtn").disabled = false;
+    document.getElementById("approveTokenBBtn").disabled = false;
+    document.getElementById("approveMintABtn").disabled = false;
+    document.getElementById("approveMintBBtn").disabled = false;
+    document.getElementById("approveSwapBtn").disabled = false;
+    document.getElementById("approveRemoveBtn").disabled = false;
+    document.getElementById("mintTokensBtn").disabled = false;
+    document.getElementById("removeLiquidityBtn").disabled = false;
+    document.getElementById("swapTokensBtn").disabled = false;
+}
+
+// Deshabilitar botones cuando la wallet está desconectada
+function disableButtons() {
+    document.getElementById("addLiquidityBtn").disabled = true;
+    document.getElementById("approveTokenABtn").disabled = true;
+    document.getElementById("approveTokenBBtn").disabled = true;
+    document.getElementById("approveMintABtn").disabled = true;
+    document.getElementById("approveMintBBtn").disabled = true;
+    document.getElementById("approveSwapBtn").disabled = true;
+    document.getElementById("approveRemoveBtn").disabled = true;
+    document.getElementById("mintTokensBtn").disabled = true;
+    document.getElementById("removeLiquidityBtn").disabled = true;
+    document.getElementById("swapTokensBtn").disabled = true;
+}
+
+// Función genérica para aprobar tokens
+async function approveTokens(contract, amount) {
+    try {
+        const tx = await contract.approve(simpleDexContract.address, amount);
+        await tx.wait();
+        console.log(`Approved ${amount} tokens.`);
+    } catch (error) {
+        console.error('Error al aprobar tokens:', error);
+        throw error;
+    }
+}
+
+// Event listeners para aprobaciones manuales
+document.getElementById("approveTokenABtn").addEventListener("click", async () => {
+    const amountA = document.getElementById("amountA").value;
+    await approveTokens(tokenAContract, amountA);
+});
+
+document.getElementById("approveTokenBBtn").addEventListener("click", async () => {
+    const amountB = document.getElementById("amountB").value;
+    await approveTokens(tokenBContract, amountB);
+});
+
+document.getElementById("approveMintABtn").addEventListener("click", async () => {
+    const mintAmountA = document.getElementById("mintAmountA").value;
+    await approveTokens(tokenAContract, mintAmountA);
+});
+
+document.getElementById("approveMintBBtn").addEventListener("click", async () => {
+    const mintAmountB = document.getElementById("mintAmountB").value;
+    await approveTokens(tokenBContract, mintAmountB);
+});
+
+document.getElementById("approveSwapBtn").addEventListener("click", async () => {
+    const swapAmount = document.getElementById("swapAmount").value;
+    const swapDirection = document.getElementById("swapDirection").value;
+    const contract = swapDirection === 'AtoB' ? tokenAContract : tokenBContract;
+    await approveTokens(contract, swapAmount);
+});
+
+document.getElementById("approveRemoveBtn").addEventListener("click", async () => {
+    const amountA = document.getElementById("removeLiquidityA").value;
+    const amountB = document.getElementById("removeLiquidityB").value;
+    await approveTokens(tokenAContract, amountA);
+    await approveTokens(tokenBContract, amountB);
+});
+
+// Función para añadir liquidez
+async function addLiquidity() {
+    const amountA = document.getElementById("amountA").value;
+    const amountB = document.getElementById("amountB").value;
+
+    try {
+        const tx = await simpleDexContract.addLiquidity(amountA, amountB);
+        await tx.wait();
+        console.log("Liquidity added successfully!");
+    } catch (error) {
+        console.error("Error adding liquidity:", error);
+    }
+}
+
+// Función para mintear tokens
+async function mintTokens() {
+    const mintAmountA = document.getElementById("mintAmountA").value;
+    const mintAmountB = document.getElementById("mintAmountB").value;
+
+    try {
+        const txA = await simpleDexContract.mintTokenA(mintAmountA);
+        const txB = await simpleDexContract.mintTokenB(mintAmountB);
+
+        await txA.wait();
+        await txB.wait();
+        console.log("Tokens minted successfully!");
+    } catch (error) {
+        console.error("Error minting tokens:", error);
+    }
+}
+
+// Función para intercambiar tokens
+async function swapTokens() {
+    const swapAmount = document.getElementById("swapAmount").value;
+    const swapDirection = document.getElementById("swapDirection").value;
+
+    try {
+        if (swapDirection === 'AtoB') {
+            const tx = await simpleDexContract.swapAToB(swapAmount);
+            await tx.wait();
+        } else {
+            const tx = await simpleDexContract.swapBToA(swapAmount);
+            await tx.wait();
+        }
+        console.log("Tokens swapped successfully!");
+    } catch (error) {
+        console.error("Error swapping tokens:", error);
+    }
+}
+
+// Función para eliminar liquidez
+async function removeLiquidity() {
+    const amountA = document.getElementById("removeLiquidityA").value;
+    const amountB = document.getElementById("removeLiquidityB").value;
+
+    try {
+        const tx = await simpleDexContract.removeLiquidity(amountA, amountB);
+        await tx.wait();
+        console.log("Liquidity removed successfully!");
+    } catch (error) {
+        console.error("Error removing liquidity:", error);
     }
 }

@@ -3,57 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple DEX</title>
+    <title>DEX</title>
+    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Simple DEX Interface</h1>
-        <p>Interactúa con el contrato inteligente del DEX</p>
-        <button id="connectWalletBtn">Connect Wallet</button>
-    </header>
-    <div id="userAddress">No hay wallet conectada.</div>
+    <h1>Simple DEX</h1>
+    <button id="connectWalletBtn">Connect Wallet</button>
+    <p id="userAddress">No hay wallet conectada.</p>
 
-    <main>
-        <div class="section">
-            <h2>Add Liquidity (Solo Owner)</h2>
-            <input type="number" id="amountA" placeholder="Cantidad Token A">
-            <input type="number" id="amountB" placeholder="Cantidad Token B">
-            <button id="addLiquidityBtn" onclick="addLiquidity()" disabled>Add Liquidity</button>
-        </div>
+    <section id="liquidity">
+        <h2>Añadir Liquidez</h2>
+        <input type="number" id="amountA" placeholder="Cantidad Token A">
+        <input type="number" id="amountB" placeholder="Cantidad Token B">
+        <button id="approveTokenABtn">Aprobar Token A</button>
+        <button id="approveTokenBBtn">Aprobar Token B</button>
+        <button id="addLiquidityBtn" disabled>Añadir Liquidez</button>
+    </section>
 
-        <div class="section">
-            <h2>Mint Tokens (Owner Approval Required)</h2>
-            <input type="number" id="mintAmountA" placeholder="Cantidad de Token A a mintear">
-            <input type="number" id="mintAmountB" placeholder="Cantidad de Token B a mintear">
-            <button id="approveMintBtn" onclick="approveMint()" disabled>Approve Mint</button>
-            <br><br>
-            <button id="mintTokensBtn" onclick="mintTokens()" disabled>Mint Tokens</button>
-        </div>
+    <section id="mint">
+        <h2>Mint Tokens</h2>
+        <input type="number" id="mintAmountA" placeholder="Cantidad Token A">
+        <input type="number" id="mintAmountB" placeholder="Cantidad Token B">
+        <button id="approveMintABtn">Aprobar Mint Token A</button>
+        <button id="approveMintBBtn">Aprobar Mint Token B</button>
+        <button id="mintTokensBtn" disabled>Mint Tokens</button>
+    </section>
 
-        <div class="section">
-            <h2>Remove Liquidity (Solo Owner)</h2>
-            <input type="number" id="removeLiquidityA" placeholder="Cantidad Token A a retirar">
-            <input type="number" id="removeLiquidityB" placeholder="Cantidad Token B a retirar">
-            <button id="removeLiquidityBtn" onclick="removeLiquidity()" disabled>Remove Liquidity</button>
-        </div>
+    <section id="swap">
+        <h2>Intercambiar Tokens</h2>
+        <input type="number" id="swapAmount" placeholder="Cantidad a Intercambiar">
+        <select id="swapDirection">
+            <option value="AtoB">Token A a Token B</option>
+            <option value="BtoA">Token B a Token A</option>
+        </select>
+        <button id="approveSwapBtn">Aprobar Intercambio</button>
+        <button id="swapTokensBtn" disabled>Intercambiar</button>
+    </section>
 
-        <div class="section">
-            <h2>Swap Tokens</h2>
-            <input type="number" id="swapAmount" placeholder="Cantidad a intercambiar">
-            <select id="swapDirection">
-                <option value="AtoB">Swap Token A to Token B</option>
-                <option value="BtoA">Swap Token B to Token A</option>
-            </select>
-            <button id="swapTokensBtn" onclick="swapTokens()" disabled>Swap Tokens</button>
-        </div>
-    </main>
+    <section id="remove-liquidity">
+        <h2>Remover Liquidez</h2>
+        <input type="number" id="removeLiquidityA" placeholder="Cantidad Token A">
+        <input type="number" id="removeLiquidityB" placeholder="Cantidad Token B">
+        <button id="approveRemoveBtn">Aprobar Remoción</button>
+        <button id="removeLiquidityBtn" disabled>Remover Liquidez</button>
+    </section>
 
-    <footer>
-        <p>&copy; 2024 Simple DEX. All rights reserved.</p>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/ethers@5.6.9/dist/ethers.umd.min.js"></script>
-    <script src="dex.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
