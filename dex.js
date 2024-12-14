@@ -77,9 +77,9 @@ async function initContracts() {
         const simpleDexABI = await loadABI(simpleDexPath);
 
         // Direcciones de contratos
-        const tokenAAddress = '0x8853207Ba4e1D7da958C95DFd39F540D6059db1f';
-        const tokenBAddress = '0xFF0954673dE78C4766150f3070982Ca12a33CfF2';
-        const simpleDexAddress = '0x9E3eb6bF6506F62Ba0355F84D477C8D0A59581E5';
+        const tokenAAddress = '0xE41179D9D5e67174DCE718D72e6A7f57dE18204F';
+        const tokenBAddress = '0xbF57c7F8D52839E1Ad2CCE460B03372170807E7D';
+        const simpleDexAddress = '0x59B3Dbffe9F27D960dDe0E6a28344D3ae91CfFA8';
 
         // Inicializar contratos con ethers.js
         tokenAContract = new ethers.Contract(tokenAAddress, tokenAABI, signer);
