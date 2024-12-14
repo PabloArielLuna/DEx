@@ -1,57 +1,65 @@
-// ABI de los contratos (simplificado para este ejemplo)
-const simpleDEXABI = [{"inputs":[{"internalType":"address","name":"_tokenA","type":"address"},{"internalType":"address","name":"_tokenB","type":"address"}],"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"amountA","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amountB","type":"uint256"}],"name":"LiquidityAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"amountA","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amountB","type":"uint256"}],"name":"LiquidityRemoved","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amountIn","type":"uint256"},{"indexed":false,"internalType":"uint256","name":"amountOut","type":"uint256"},{"indexed":false,"internalType":"string","name":"direction","type":"string"}],"name":"TokensSwapped","type":"event"},{"inputs":[{"internalType":"uint256","name":"amountA","type":"uint256"},{"internalType":"uint256","name":"amountB","type":"uint256"}],"name":"addLiquidity","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"_token","type":"address"}],"name":"getPrice","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amountA","type":"uint256"},{"internalType":"uint256","name":"amountB","type":"uint256"}],"name":"removeLiquidity","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"reserveA","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"reserveB","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"amountAIn","type":"uint256"}],"name":"swapAforB","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"amountBIn","type":"uint256"}],"name":"swapBforA","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"tokenA","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"tokenB","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"stateMutability":"view","type":"function"}];
-// ABI de los contratos (simplificado para este ejemplo)
-const tokenAABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"allowance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientAllowance","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientBalance","type":"error"},{"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC20InvalidApprover","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC20InvalidReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC20InvalidSender","type":"error"},{"inputs":[{"internalType":"address","name":"spender","type":"address"}],"name":"ERC20InvalidSpender","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}];
-const tokenBABI = [{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"allowance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientAllowance","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"},{"internalType":"uint256","name":"balance","type":"uint256"},{"internalType":"uint256","name":"needed","type":"uint256"}],"name":"ERC20InsufficientBalance","type":"error"},{"inputs":[{"internalType":"address","name":"approver","type":"address"}],"name":"ERC20InvalidApprover","type":"error"},{"inputs":[{"internalType":"address","name":"receiver","type":"address"}],"name":"ERC20InvalidReceiver","type":"error"},{"inputs":[{"internalType":"address","name":"sender","type":"address"}],"name":"ERC20InvalidSender","type":"error"},{"inputs":[{"internalType":"address","name":"spender","type":"address"}],"name":"ERC20InvalidSpender","type":"error"},{"inputs":[{"internalType":"address","name":"owner","type":"address"}],"name":"OwnableInvalidOwner","type":"error"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"OwnableUnauthorizedAccount","type":"error"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"owner","type":"address"},{"indexed":true,"internalType":"address","name":"spender","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Approval","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"from","type":"address"},{"indexed":true,"internalType":"address","name":"to","type":"address"},{"indexed":false,"internalType":"uint256","name":"value","type":"uint256"}],"name":"Transfer","type":"event"},{"inputs":[{"internalType":"address","name":"owner","type":"address"},{"internalType":"address","name":"spender","type":"address"}],"name":"allowance","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"spender","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"approve","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"decimals","outputs":[{"internalType":"uint8","name":"","type":"uint8"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"mint","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"name","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"renounceOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"symbol","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transfer","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"from","type":"address"},{"internalType":"address","name":"to","type":"address"},{"internalType":"uint256","name":"value","type":"uint256"}],"name":"transferFrom","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"stateMutability":"nonpayable","type":"function"}]
+// Rutas de los ABI
+const tokenAPath = './Abi/TokenA.json';
+const tokenBPath = './Abi/TokenB.json';
+const simpleDexPath = './Abi/simpleDex.json';
 
-const simpleDEXAddress = "0x59B3Dbffe9F27D960dDe0E6a28344D3ae91CfFA8";  // Dirección del contrato SimpleDEX
-const tokenAAddress = "0xE41179D9D5e67174DCE718D72e6A7f57dE18204F";  // Dirección del contrato TokenA
-const tokenBAddress = "0xbF57c7F8D52839E1Ad2CCE460B03372170807E7D";  // Dirección del contrato TokenB
-const walletButton = document.getElementById("connectWalletBtn");
+let provider;
+let signer;
+let tokenAContract;
+let tokenBContract;
+let simpleDexContract;
+let userAddress;
 
-let provider, signer, simpleDEXContract, tokenAContract, tokenBContract, userAddress;
+// Cargar los ABI dinámicamente
+async function loadABI(path) {
+    try {
+        const response = await fetch(path);
+        if (!response.ok) {
+            throw new Error(`No se pudo cargar el ABI desde: ${path}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error al cargar ABI:', error);
+        throw error;
+    }
+}
 
-// Función para conectar la wallet (MetaMask)
+// Conectar Wallet
 async function connectWallet() {
-    if (typeof window.ethereum !== "undefined") {
+    if (typeof window.ethereum !== 'undefined') {
         try {
-            // Solicitar acceso a la cuenta MetaMask
+            await ethereum.request({ method: 'eth_requestAccounts' });
             provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []); // Solicitar la cuenta
             signer = provider.getSigner();
-            userAddress = await signer.getAddress(); // Obtener la dirección de la wallet
 
-            // Inicializar contratos
-            simpleDEXContract = new ethers.Contract(simpleDEXAddress, simpleDEXABI, signer);
-            tokenAContract = new ethers.Contract(tokenAAddress, tokenABI, signer);
-            tokenBContract = new ethers.Contract(tokenBAddress, tokenABI, signer);
-
-            // Cambiar el texto del botón y mostrar la dirección
-            walletButton.textContent = "Disconnect Wallet";
-            console.log("Conectado a MetaMask. Dirección: ", userAddress);
-
-            // Aquí podrías mostrar la dirección en alguna parte de la UI, si lo deseas
+            userAddress = await signer.getAddress();
             document.getElementById("userAddress").textContent = `Dirección: ${userAddress}`;
+            document.getElementById("connectWalletBtn").textContent = "Disconnect Wallet";
+            console.log('Wallet conectada:', userAddress);
 
-        } catch (error) {
-            console.error("Error al conectar con MetaMask:", error);
-            alert("Hubo un problema al conectar con MetaMask. Asegúrate de que MetaMask esté instalado.");
+            await initContracts();
+            enableButtons();
+        } catch (err) {
+            console.error('Error al conectar wallet:', err);
+            alert('Error al conectar la wallet. Revisa la consola para más detalles.');
         }
     } else {
-        alert("MetaMask no está instalado. Por favor, instálalo.");
+        alert('MetaMask no está instalado. Instálalo y recarga la página.');
     }
 }
 
 // Función para desconectar la wallet (no hay desconexión real, solo cambiamos el estado del botón)
 function disconnectWallet() {
-    walletButton.textContent = "Connect Wallet"; // Volver a mostrar el texto de conectar
+    document.getElementById("connectWalletBtn").textContent = "Connect Wallet";
     console.log("Desconectado de MetaMask");
 
     // Limpiar la dirección (opcional)
     document.getElementById("userAddress").textContent = "No hay wallet conectada.";
+    disableButtons();
 }
 
 // Agregar el evento al botón de conectar/desconectar
+const walletButton = document.getElementById("connectWalletBtn");
 walletButton.addEventListener('click', async () => {
     if (walletButton.innerText === 'Connect Wallet') {
         await connectWallet();
@@ -60,13 +68,56 @@ walletButton.addEventListener('click', async () => {
     }
 });
 
+// Inicializar contratos
+async function initContracts() {
+    try {
+        // Cargar los ABIs
+        const tokenAABI = await loadABI(tokenAPath);
+        const tokenBABI = await loadABI(tokenBPath);
+        const simpleDexABI = await loadABI(simpleDexPath);
+
+        // Direcciones de contratos
+        const tokenAAddress = '0x8853207Ba4e1D7da958C95DFd39F540D6059db1f';
+        const tokenBAddress = '0xFF0954673dE78C4766150f3070982Ca12a33CfF2';
+        const simpleDexAddress = '0x9E3eb6bF6506F62Ba0355F84D477C8D0A59581E5';
+
+        // Inicializar contratos con ethers.js
+        tokenAContract = new ethers.Contract(tokenAAddress, tokenAABI, signer);
+        tokenBContract = new ethers.Contract(tokenBAddress, tokenBABI, signer);
+        simpleDexContract = new ethers.Contract(simpleDexAddress, simpleDexABI, signer);
+
+        console.log('Contratos inicializados correctamente.');
+    } catch (error) {
+        console.error('Error al inicializar contratos:', error);
+        alert('No se pudieron inicializar los contratos. Revisa la consola.');
+    }
+}
+
+// Habilitar botones cuando la wallet está conectada
+function enableButtons() {
+    document.getElementById("addLiquidityBtn").disabled = false;
+    document.getElementById("approveMintBtn").disabled = false;
+    document.getElementById("mintTokensBtn").disabled = false;
+    document.getElementById("removeLiquidityBtn").disabled = false;
+    document.getElementById("swapTokensBtn").disabled = false;
+}
+
+// Deshabilitar botones cuando la wallet está desconectada
+function disableButtons() {
+    document.getElementById("addLiquidityBtn").disabled = true;
+    document.getElementById("approveMintBtn").disabled = true;
+    document.getElementById("mintTokensBtn").disabled = true;
+    document.getElementById("removeLiquidityBtn").disabled = true;
+    document.getElementById("swapTokensBtn").disabled = true;
+}
+
 // Función para añadir liquidez (solo Owner)
 async function addLiquidity() {
     const amountA = document.getElementById("amountA").value;
     const amountB = document.getElementById("amountB").value;
 
     try {
-        const tx = await simpleDEXContract.addLiquidity(amountA, amountB);
+        const tx = await simpleDexContract.addLiquidity(amountA, amountB);
         await tx.wait();
         console.log("Liquidity added successfully!");
     } catch (error) {
@@ -80,10 +131,10 @@ async function approveMint() {
     const mintAmountB = document.getElementById("mintAmountB").value;
 
     try {
-        const approveTxA = await tokenAContract.approve(simpleDEXAddress, mintAmountA);
+        const approveTxA = await tokenAContract.approve(simpleDexContract.address, mintAmountA);
         await approveTxA.wait();
 
-        const approveTxB = await tokenBContract.approve(simpleDEXAddress, mintAmountB);
+        const approveTxB = await tokenBContract.approve(simpleDexContract.address, mintAmountB);
         await approveTxB.wait();
 
         console.log("Minting approved!");
@@ -98,8 +149,8 @@ async function mintTokens() {
     const mintAmountB = document.getElementById("mintAmountB").value;
 
     try {
-        const txA = await simpleDEXContract.mintTokenA(mintAmountA);
-        const txB = await simpleDEXContract.mintTokenB(mintAmountB);
+        const txA = await simpleDexContract.mintTokenA(mintAmountA);
+        const txB = await simpleDexContract.mintTokenB(mintAmountB);
 
         await txA.wait();
         await txB.wait();
@@ -110,52 +161,4 @@ async function mintTokens() {
     }
 }
 
-// Función para eliminar liquidez (solo Owner)
-async function removeLiquidity() {
-    const removeAmountA = document.getElementById("removeLiquidityA").value;
-    const removeAmountB = document.getElementById("removeLiquidityB").value;
 
-    try {
-        const tx = await simpleDEXContract.removeLiquidity(removeAmountA, removeAmountB);
-        await tx.wait();
-        console.log("Liquidity removed successfully!");
-    } catch (error) {
-        console.error("Error removing liquidity:", error);
-    }
-}
-
-// Función para hacer swap entre tokens (A a B o B a A)
-async function swapTokens() {
-    const swapAmount = document.getElementById("swapAmount").value;
-    const swapDirection = document.getElementById("swapDirection").value;
-
-    try {
-        if (swapDirection === "AtoB") {
-            const allowanceA = await tokenAContract.allowance(userAddress, simpleDEXAddress);
-            if (allowanceA < swapAmount) {
-                const approvalTx = await tokenAContract.approve(simpleDEXAddress, swapAmount);
-                await approvalTx.wait();
-            }
-            const tx = await simpleDEXContract.swapAforB(swapAmount);
-            await tx.wait();
-            console.log("Swap A to B successful!");
-        } else if (swapDirection === "BtoA") {
-            const allowanceB = await tokenBContract.allowance(userAddress, simpleDEXAddress);
-            if (allowanceB < swapAmount) {
-                const approvalTx = await tokenBContract.approve(simpleDEXAddress, swapAmount);
-                await approvalTx.wait();
-            }
-            const tx = await simpleDEXContract.swapBforA(swapAmount);
-            await tx.wait();
-            console.log("Swap B to A successful!");
-        }
-    } catch (error) {
-        console.error("Error swapping tokens:", error);
-    }
-}
-
-// Inicializar la conexión al cargar la página
-window.onload = () => {
-    const connectWalletBtn = document.getElementById("connectWalletBtn");
-    connectWalletBtn.addEventListener("click", connectWallet);
-};
