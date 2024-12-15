@@ -27,16 +27,10 @@ contract TokenB is ERC20, Ownable {
         _mint(msg.sender, 1000 * 10 ** decimals());
     }
 
-    /**
-     * @notice Mints tokens to a specified address.
-     * @param to The address to mint tokens to.
-     * @param amount The amount of tokens to mint.
-     */
-    function mint(address to, uint256 amount) public {
-        if (msg.sender != owner()) {
-            require(allowance(to, msg.sender) >= amount, "Mint not approved");
-            _approve(to, msg.sender, allowance(to, msg.sender) - amount);
-        }
+    // A public function to mint new tokens.
+    // This function is restricted to the contract owner by the onlyOwner modifier.
+    // 'to' specifies the recipient address, and 'amount' indicates the number of tokens to mint.
+    function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount); // Minting the specified amount of tokens to the provided address.
     }
 }

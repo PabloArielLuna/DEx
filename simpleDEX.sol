@@ -58,7 +58,7 @@ contract SimpleDEX {
 
     /**
      * @notice Adds liquidity to the pool.
-     * @dev Requires the sender to be the owner and tokens to be approved beforehand.
+     * @dev Requires the sender to be the owner and maintains reserve ratios.
      * @param amountA Amount of token A to add.
      * @param amountB Amount of token B to add.
      */
@@ -68,15 +68,6 @@ contract SimpleDEX {
         if (reserveA > 0 && reserveB > 0) {
             require(amountA * reserveB == amountB * reserveA, "Invalid ratio");
         }
-
-        require(
-            tokenA.allowance(msg.sender, address(this)) >= amountA,
-            "Token A allowance too low"
-        );
-        require(
-            tokenB.allowance(msg.sender, address(this)) >= amountB,
-            "Token B allowance too low"
-        );
 
         tokenA.transferFrom(msg.sender, address(this), amountA);
         tokenB.transferFrom(msg.sender, address(this), amountB);
@@ -89,7 +80,7 @@ contract SimpleDEX {
 
     /**
      * @notice Swaps token A for token B.
-     * @dev Uses a constant product formula for calculating the output amount. Tokens must be approved beforehand.
+     * @dev Uses a constant product formula for calculating the output amount.
      * @param amountAIn Amount of token A to swap.
      */
     function swapAforB(uint256 amountAIn) external {
@@ -98,11 +89,6 @@ contract SimpleDEX {
 
         uint256 amountBOut = (reserveB * amountAIn) / (reserveA + amountAIn);
         require(amountBOut > 0, "Insufficient output amount");
-
-        require(
-            tokenA.allowance(msg.sender, address(this)) >= amountAIn,
-            "Token A allowance too low"
-        );
 
         tokenA.transferFrom(msg.sender, address(this), amountAIn);
         tokenB.transfer(msg.sender, amountBOut);
@@ -115,7 +101,7 @@ contract SimpleDEX {
 
     /**
      * @notice Swaps token B for token A.
-     * @dev Uses a constant product formula for calculating the output amount. Tokens must be approved beforehand.
+     * @dev Uses a constant product formula for calculating the output amount.
      * @param amountBIn Amount of token B to swap.
      */
     function swapBforA(uint256 amountBIn) external {
@@ -124,11 +110,6 @@ contract SimpleDEX {
 
         uint256 amountAOut = (reserveA * amountBIn) / (reserveB + amountBIn);
         require(amountAOut > 0, "Insufficient output amount");
-
-        require(
-            tokenB.allowance(msg.sender, address(this)) >= amountBIn,
-            "Token B allowance too low"
-        );
 
         tokenB.transferFrom(msg.sender, address(this), amountBIn);
         tokenA.transfer(msg.sender, amountAOut);

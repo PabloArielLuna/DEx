@@ -1,164 +1,222 @@
-// Rutas de los ABI
-const tokenAPath = './Abi/TokenA.json';
-const tokenBPath = './Abi/TokenB.json';
-const simpleDexPath = './Abi/simpleDex.json';
-
+// Global variables
 let provider;
 let signer;
-let tokenAContract;
-let tokenBContract;
-let simpleDexContract;
-let userAddress;
+let simpleDex;
+let tokenA;
+let tokenB;
+let selectedToken;
 
-// Cargar los ABI dinámicamente
+// Contract addresses
+const tokenAAddress = '0xA521fC2826673ac550e1266F788d294B904447d2';
+const tokenBAddress = '0xB70A4Dc89943820dF6373776064CC5B73e367de1';
+const simpleDexAddress = '0x932B91EabfB0b6CbeA320e50C55a92de4b76f624';
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Load ABIs from external files
 async function loadABI(path) {
+    const response = await fetch(path);
+    if (!response.ok) throw new Error(`Error loading ABI from ${path}`);
+    return await response.json();
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Initialize provider and contracts
+async function initializeProvider() {
+    if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        signer = provider.getSigner();
+        await ethereum.request({ method: 'eth_requestAccounts' });
+
+        const [simpleDexABI, tokenAABI, tokenBABI] = await Promise.all([
+            loadABI('./Abi/simpleDex.json'),
+            loadABI('./Abi/TokenA.json'),
+            loadABI('./Abi/TokenB.json')
+        ]);
+
+        // Instanciamos los contratos
+        simpleDex = new ethers.Contract(simpleDexAddress, simpleDexABI, signer);
+        tokenA = new ethers.Contract(tokenAAddress, tokenAABI, signer);
+        tokenB = new ethers.Contract(tokenBAddress, tokenBABI, signer);
+
+        // Actualizamos la interfaz de usuario
+        updateWalletInfo();
+    } else {
+        alert('Install Metamask');
+    }
+}
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Update gas information
+async function updateGasInfo() {
     try {
-        const response = await fetch(path);
-        if (!response.ok) {
-            throw new Error(`No se pudo cargar el ABI desde: ${path}`);
-        }
-        return await response.json();
+        
+        document.getElementById('gas-amount').textContent = `${ethers.utils.formatUnits(gasPrice, "gwei")} Gwei`;
     } catch (error) {
-        console.error('Error al cargar ABI:', error);
-        throw error;
+        console.error("Error getting gas price:", error);
+        document.getElementById('gas-amount').textContent = "Not available";
     }
 }
 
-// Conectar Wallet
-async function connectWallet() {
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            await ethereum.request({ method: 'eth_requestAccounts' });
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            signer = provider.getSigner();
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-            userAddress = await signer.getAddress();
-            document.getElementById("userAddress").textContent = `Dirección: ${userAddress}`;
-            document.getElementById("connectWalletBtn").textContent = "Disconnect Wallet";
-            console.log('Wallet conectada:', userAddress);
+// Update connected wallet information
+async function updateWalletInfo() {
+    const address = await signer.getAddress();
+    const balance = await provider.getBalance(address);
+    const network = await provider.getNetwork();
+    const gasPrice = await provider.getGasPrice();
 
-            await initContracts();
-            enableButtons();
-        } catch (err) {
-            console.error('Error al conectar wallet:', err);
-            alert('Error al conectar la wallet. Revisa la consola para más detalles.');
-        }
-    } else {
-        alert('MetaMask no está instalado. Instálalo y recarga la página.');
-    }
+    // Update the data on the interface
+    document.getElementById('wallet-address').textContent = address;
+    document.getElementById('eth-balance').textContent = ethers.utils.formatEther(balance);
+    document.getElementById('network-name').textContent = network.name;
+    document.getElementById('gas-amount').textContent = `${ethers.utils.formatUnits(gasPrice, "gwei")} Gwei`;
+
+    // Display the functions section
+    document.getElementById('wallet-info').classList.remove('hidden');
+    document.getElementById('btn-connect').classList.add('hidden');
+    document.getElementById('btn-disconnect').classList.remove('hidden');
 }
 
-// Función para desconectar la wallet (no hay desconexión real, solo cambiamos el estado del botón)
-function disconnectWallet() {
-    document.getElementById("connectWalletBtn").textContent = "Connect Wallet";
-    console.log("Desconectado de MetaMask");
-
-    // Limpiar la dirección (opcional)
-    document.getElementById("userAddress").textContent = "No hay wallet conectada.";
-    disableButtons();
-}
-
-// Agregar el evento al botón de conectar/desconectar
-const walletButton = document.getElementById("connectWalletBtn");
-walletButton.addEventListener('click', async () => {
-    if (walletButton.innerText === 'Connect Wallet') {
-        await connectWallet();
-    } else {
-        disconnectWallet();
-    }
+// Function to connect the wallet
+document.getElementById('btn-connect').addEventListener('click', () => {
+    initializeProvider();
 });
 
-// Inicializar contratos
-async function initContracts() {
-    try {
-        // Cargar los ABIs
-        const tokenAABI = await loadABI(tokenAPath);
-        const tokenBABI = await loadABI(tokenBPath);
-        const simpleDexABI = await loadABI(simpleDexPath);
+// Function to disconnect the wallet
+document.getElementById('btn-disconnect').addEventListener('click', () => {
+    location.reload(); // Recargar la página para "desconectar"
+});
 
-        // Direcciones de contratos
-        const tokenAAddress = '0xE41179D9D5e67174DCE718D72e6A7f57dE18204F';
-        const tokenBAddress = '0xbF57c7F8D52839E1Ad2CCE460B03372170807E7D';
-        const simpleDexAddress = '0x59B3Dbffe9F27D960dDe0E6a28344D3ae91CfFA8';
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-        // Inicializar contratos con ethers.js
-        tokenAContract = new ethers.Contract(tokenAAddress, tokenAABI, signer);
-        tokenBContract = new ethers.Contract(tokenBAddress, tokenBABI, signer);
-        simpleDexContract = new ethers.Contract(simpleDexAddress, simpleDexABI, signer);
-
-        console.log('Contratos inicializados correctamente.');
-    } catch (error) {
-        console.error('Error al inicializar contratos:', error);
-        alert('No se pudieron inicializar los contratos. Revisa la consola.');
-    }
-}
-
-// Habilitar botones cuando la wallet está conectada
-function enableButtons() {
-    document.getElementById("addLiquidityBtn").disabled = false;
-    document.getElementById("approveMintBtn").disabled = false;
-    document.getElementById("mintTokensBtn").disabled = false;
-    document.getElementById("removeLiquidityBtn").disabled = false;
-    document.getElementById("swapTokensBtn").disabled = false;
-}
-
-// Deshabilitar botones cuando la wallet está desconectada
-function disableButtons() {
-    document.getElementById("addLiquidityBtn").disabled = true;
-    document.getElementById("approveMintBtn").disabled = true;
-    document.getElementById("mintTokensBtn").disabled = true;
-    document.getElementById("removeLiquidityBtn").disabled = true;
-    document.getElementById("swapTokensBtn").disabled = true;
-}
-
-// Función para añadir liquidez (solo Owner)
+// Function to add liquidity
 async function addLiquidity() {
-    const amountA = document.getElementById("amountA").value;
-    const amountB = document.getElementById("amountB").value;
+    const tokenAAmount = document.getElementById('addLiquidityTokenA').value;
+    const tokenBAmount = document.getElementById('addLiquidityTokenB').value;
+
+    if (tokenAAmount <= 0 || tokenBAmount <= 0) {
+        alert('Por favor ingresa cantidades válidas');
+        return;
+    }
 
     try {
-        const tx = await simpleDexContract.addLiquidity(amountA, amountB);
+        // Approve tokens before adding liquidity
+        await tokenA.approve(simpleDexAddress, ethers.utils.parseUnits(tokenAAmount, 18));
+        await tokenB.approve(simpleDexAddress, ethers.utils.parseUnits(tokenBAmount, 18));
+
+        // Call the function to add liquidity
+        const tx = await simpleDex.addLiquidity(
+            ethers.utils.parseUnits(tokenAAmount, 18),
+            ethers.utils.parseUnits(tokenBAmount, 18)
+        );
         await tx.wait();
-        console.log("Liquidity added successfully!");
+        alert1('Liquidity added successfully');
     } catch (error) {
-        console.error("Error adding liquidity:", error);
+        console.error('Error adding liquidity: ');
+        alert('Error adding liquidity');
     }
 }
 
-// Función para aprobar el minting (solo Owner puede aprobar)
-async function approveMint() {
-    const mintAmountA = document.getElementById("mintAmountA").value;
-    const mintAmountB = document.getElementById("mintAmountB").value;
+document.getElementById('btn-addLiquidity').addEventListener('click', addLiquidity);
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Function to remove liquidity
+async function removeLiquidity() {
+    const tokenAAmount = document.getElementById('removeLiquidityTokenA').value;
+    const tokenBAmount = document.getElementById('removeLiquidityTokenB').value;
+
+    if (tokenAAmount <= 0 || tokenBAmount <= 0) {
+        alert('Please enter valid amounts');
+        return;
+    }
 
     try {
-        const approveTxA = await tokenAContract.approve(simpleDexContract.address, mintAmountA);
-        await approveTxA.wait();
-
-        const approveTxB = await tokenBContract.approve(simpleDexContract.address, mintAmountB);
-        await approveTxB.wait();
-
-        console.log("Minting approved!");
+        // Call the function to remove liquidity
+        const tx = await simpleDex.removeLiquidity(
+            ethers.utils.parseUnits(tokenAAmount, 18),
+            ethers.utils.parseUnits(tokenBAmount, 18)
+        );
+        await tx.wait();
+        alert('Liquidity removed successfully');
     } catch (error) {
-        console.error("Error approving mint:", error);
+        console.error('Error removing liquidity: ', error);
+        alert('Error removing liquidity');
     }
 }
 
-// Función para mintear tokens (solo Owner puede mint)
-async function mintTokens() {
-    const mintAmountA = document.getElementById("mintAmountA").value;
-    const mintAmountB = document.getElementById("mintAmountB").value;
+document.getElementById('btn-removeLiquidity').addEventListener('click', removeLiquidity);
+
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+// Function to swap tokens
+async function swapTokens() {
+    const tokenToSwap = document.getElementById('tokenToSwap').value;
+    const swapAmount = document.getElementById('swapAmount').value;
+
+    if (swapAmount <= 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+
+    const amountIn = ethers.utils.parseUnits(swapAmount, 18);
 
     try {
-        const txA = await simpleDexContract.mintTokenA(mintAmountA);
-        const txB = await simpleDexContract.mintTokenB(mintAmountB);
-
-        await txA.wait();
-        await txB.wait();
-
-        console.log("Tokens minted successfully!");
+        let tx;
+        if (tokenToSwap === 'tokenA') {
+            // Approve Token A for the swap
+            await tokenA.approve(simpleDexAddress, amountIn);
+            tx = await simpleDex.swapTokenAForTokenB(amountIn);
+        } else {
+            // Approve Token B for the swap
+            await tokenB.approve(simpleDexAddress, amountIn);
+            tx = await simpleDex.swapTokenBForTokenA(amountIn);
+        }
+        await tx.wait();
+        alert('Swap successful');
     } catch (error) {
-        console.error("Error minting tokens:", error);
+        console.error('Error swapping tokens: ', error);
+        alert('Error swapping tokens');
     }
 }
 
+document.getElementById('btn-swap').addEventListener('click', swapTokens);
 
+//- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+// Function to get the token price
+async function getTokenPrice() {
+    const tokenToGetPrice = document.getElementById('tokenPrice').value; // Obtener el valor seleccionado
+    let tokenAddress;
+
+    // Determine the selected token address
+    if (tokenToGetPrice === 'tokenA') {
+        tokenAddress = tokenAAddress;
+    } else if (tokenToGetPrice === 'tokenB') {
+        tokenAddress = tokenBAddress;
+    } else {
+        alert('Token no válido');
+        return;
+    }
+
+    try {
+        // Call the 'getPrice' function passing the token address
+        const price = await simpleDex.getPrice(tokenAddress);
+
+        // Verify if the price is valid before displaying it
+        if (price && price.gt(0)) {
+            // Display the price on the interface, proper format
+            document.getElementById('priceResult').textContent = `Price: ${ethers.utils.formatUnits(price, 18)} ETH`;
+        } else {
+            document.getElementById('priceResult').textContent = "Price not available";
+        }
+    } catch (error) {
+        console.error('Error getting price: ', error);
+        alert('Error getting price');
+    }
+}
+
+document.getElementById('btn-getPrice').addEventListener('click', getTokenPrice);

@@ -11,8 +11,8 @@ pragma solidity ^0.8.22;
 
 // Importing the ERC20 and Ownable contracts from the OpenZeppelin library.
 // ERC20 is used for creating a standard token, and Ownable provides access control mechanisms.
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 // Defining the TokenA contract, which inherits from both ERC20 and Ownable.
 contract TokenA is ERC20, Ownable {
@@ -27,16 +27,10 @@ contract TokenA is ERC20, Ownable {
         _mint(msg.sender, 1000 * 10 ** decimals());
     }
 
-    /**
-     * @notice Mints tokens to a specified address.
-     * @param to The address to mint tokens to.
-     * @param amount The amount of tokens to mint.
-     */
-    function mint(address to, uint256 amount) public {
-        if (msg.sender != owner()) {
-            require(allowance(to, msg.sender) >= amount, "Mint not approved");
-            _approve(to, msg.sender, allowance(to, msg.sender) - amount);
-        }
+    // A public function to mint new tokens.
+    // Only the owner of the contract can call this function, as it is restricted by the onlyOwner modifier.
+    // 'to' is the recipient address, and 'amount' is the number of tokens to mint.
+    function mint(address to, uint256 amount) public onlyOwner {
         _mint(to, amount); // Minting the specified amount of tokens to the recipient address.
     }
 }
