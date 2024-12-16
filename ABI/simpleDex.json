@@ -73,15 +73,9 @@
                 "internalType": "uint256",
                 "name": "amountOut",
                 "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "string",
-                "name": "direction",
-                "type": "string"
             }
         ],
-        "name": "TokensSwapped",
+        "name": "TokenSwapped",
         "type": "event"
     },
     {

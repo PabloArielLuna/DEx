@@ -9,7 +9,7 @@ let selectedToken;
 // Contract addresses
 const tokenAAddress = '0xA521fC2826673ac550e1266F788d294B904447d2';
 const tokenBAddress = '0xB70A4Dc89943820dF6373776064CC5B73e367de1';
-const simpleDexAddress = '0x932B91EabfB0b6CbeA320e50C55a92de4b76f624';
+const simpleDexAddress = '0x9c8B04dd1CE6d108E8e011164f50aA432fc515F6';
 
 //- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
@@ -35,12 +35,12 @@ async function initializeProvider() {
             loadABI('./Abi/TokenB.json')
         ]);
 
-        // Instanciamos los contratos
+        // Instantiate the contracts
         simpleDex = new ethers.Contract(simpleDexAddress, simpleDexABI, signer);
         tokenA = new ethers.Contract(tokenAAddress, tokenAABI, signer);
         tokenB = new ethers.Contract(tokenBAddress, tokenBABI, signer);
 
-        // Actualizamos la interfaz de usuario
+        // Update the user interface
         updateWalletInfo();
     } else {
         alert('Install Metamask');
