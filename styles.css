@@ -1,61 +1,110 @@
-body,
-html {
-    height: 50%;
+/* Reset y Configuración Base */
+body, html {
+    height: 100%;
+    margin: 0;
+    background-color: #1E1E2E;
+    color: #E2E8F0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     display: flex;
-    align-items:flex-start;
+    align-items: flex-start;
     justify-content: center;
-    background-color: rgb(244, 245, 245);
-    font-family: Verdana;
+    line-height: 1.6;
 }
 
-    header {
-        background-color: #007bff;
-        color: white;
-        text-align: center;
-        padding: 1rem;
-    }
+/* Contenedor principal */
+.w-full {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #2E2E3F;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
 
-    header h1 {
-        margin: 0;
-    }
+/* Encabezado */
+h1 {
+    font-size: 2.5rem;
+    color: #7C3AED;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+}
 
-    main {
-        padding: 2rem;
-        max-width: 800px;
-        margin: auto;
-    }
+/* Botones */
+button {
+    display: inline-block;
+    background-color: #7C3AED;
+    color: #E2E8F0;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    text-align: center;
+}
 
-/* Sombra para todos los <div> */
+button:hover {
+    background-color: #9F67F2;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+button.bg-red-600 {
+    background-color: #E11D48;
+}
+
+button.bg-red-600:hover {
+    background-color: #F43F5E;
+}
+
+button:disabled {
+    background-color: #4B5563;
+    color: #9CA3AF;
+    cursor: not-allowed;
+}
+
+/* Input y Select */
+input, select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    background-color: #1E1E2E;
+    border: 1px solid #7C3AED;
+    border-radius: 8px;
+    color: #E2E8F0;
+    transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus {
+    border-color: #9F67F2;
+    outline: none;
+}
+
+/* Cards */
 .card {
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Más desplazamiento y más desenfoque */ 
+    background-color: #2E2E3F;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    margin-bottom: 1.5rem;
 }
 
+.card h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.25rem;
+    color: #14B8A6;
+    margin-bottom: 1rem;
+}
 
-    .section {
-        margin-bottom: 2rem;
-    }
+.card img {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(82%) saturate(503%) hue-rotate(150deg) brightness(95%) contrast(101%);
+}
 
-    .section h2 {
-        margin-bottom: 1rem;
-    }
-
-    input,
-    select,
-    button {
-        display: block;
-        width: 100%;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-    }
-
-    button {
-        background-color: #007bff;
-        color: white;
-        border: none;
-        cursor: pointer;
-    }
-
-    button:disabled {
-        background-color: #ccc;
-        cursor: not-allowed;
-    }
+/* Resultados */
+#priceResult {
+    color: #94A3B8;
+    font-weight: bold;
+    margin-top: 1rem;
+    font-size: 1rem;
+}
